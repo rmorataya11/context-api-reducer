@@ -1,6 +1,7 @@
-import { useContext } from "react"
+import { useContext, useEffect } from "react"
 import { BudgetForm } from './components/BudgetForm'
 import { BudgetTracker } from './components/BudgetTracker'
+import { FilterByCategory } from './components/FilterByCategory'
 import { ExpenseList } from './components/ExpenseList'
 import ExpenseModal from './components/ExpenseModal'
 import { BudgetStateContext } from './context/BudgetContext'
@@ -8,6 +9,14 @@ import { BudgetStateContext } from './context/BudgetContext'
 function App() {
   const state = useContext(BudgetStateContext)
   const isValidBudget = state.budget > 0
+
+  useEffect(() => {
+    localStorage.setItem("budget", state.budget.toString())
+  }, [state.budget])
+
+  useEffect(() => {
+    localStorage.setItem("expenses", JSON.stringify(state.expenses))
+  }, [state.expenses])
 
   return (
     <>
@@ -21,6 +30,7 @@ function App() {
       </div>
       {isValidBudget && (
         <main className="max-w-3xl mx-auto py-10">
+          <FilterByCategory />
           <ExpenseList />
           <ExpenseModal />
         </main>

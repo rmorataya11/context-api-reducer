@@ -46,6 +46,18 @@ export const ExpenseForm = () => {
       setError('Todos los Campos son Obligatorios')
       return
     }
+    const totalExpenses = state.expenses.reduce((sum, e) => sum + e.amount, 0)
+    let newTotal
+    if (state.editingId) {
+      const oldExpense = state.expenses.find((e) => e.id === state.editingId)
+      newTotal = totalExpenses - (oldExpense?.amount ?? 0) + expense.amount
+    } else {
+      newTotal = totalExpenses + expense.amount
+    }
+    if (newTotal > state.budget) {
+      setError('La suma de los gastos supera el presupuesto')
+      return
+    }
     setError('')
     if (state.editingId) {
       dispatch({
@@ -66,7 +78,7 @@ export const ExpenseForm = () => {
   return (
     <form className="space-y-5" onSubmit={handleSubmit}>
       <legend className="uppercase text-center text-2xl font-black border-b-4 border-blue-500 py-2">
-        Nuevo gasto
+        {state.editingId ? "Guardar cambios" : "Nuevo gasto"}
       </legend>
       {error && <ErrorMessage>{error}</ErrorMessage>}
       <div className="flex flex-col gap-2">
@@ -128,7 +140,7 @@ export const ExpenseForm = () => {
       </div>
       <input
         type="submit"
-        value="Registrar gasto"
+        value={state.editingId ? "Guardar cambios" : "Registrar gasto"}
         className="bg-blue-600 cursor-pointer w-full p-2 text-white uppercase font-bold rounded-lg"
       />
     </form>
