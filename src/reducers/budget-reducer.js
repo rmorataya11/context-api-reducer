@@ -1,7 +1,8 @@
 export const initialState = {
   budget: 0,
   modal: false,
-  expenses: []
+  expenses: [],
+  editingId: ""
 }
 
 export const budgetReducer = (state, action) => {
@@ -11,7 +12,7 @@ export const budgetReducer = (state, action) => {
     case "show-modal":
       return { ...state, modal: true }
     case "close-modal":
-      return { ...state, modal: false }
+      return { ...state, modal: false, editingId: "" }
     case "add-expense":
       return {
         ...state,
@@ -22,6 +23,21 @@ export const budgetReducer = (state, action) => {
       return {
         ...state,
         expenses: state.expenses.filter((expense) => expense.id !== action.payload.id)
+      }
+    case "get-expense-by-id":
+      return {
+        ...state,
+        editingId: action.payload.id,
+        modal: true
+      }
+    case "update-expense":
+      return {
+        ...state,
+        expenses: state.expenses.map((expense) =>
+          expense.id === action.payload.expense.id ? action.payload.expense : expense
+        ),
+        modal: false,
+        editingId: ""
       }
     default:
       return state

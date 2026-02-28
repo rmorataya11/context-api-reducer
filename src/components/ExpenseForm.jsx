@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useContext, useState, useEffect } from 'react'
 import { categories } from '../data/categories'
 import DatePicker from 'react-date-picker'
 import 'react-date-picker/dist/DatePicker.css'
@@ -17,6 +17,15 @@ export const ExpenseForm = () => {
 
   const dispatch = useContext(BudgetDispatchContext)
   const state = useContext(BudgetStateContext)
+
+  useEffect(() => {
+    if (state.editingId) {
+      const editingExpense = state.expenses.filter(
+        (currentExpense) => currentExpense.id === state.editingId
+      )[0]
+      setExpense(editingExpense)
+    }
+  }, [state.editingId])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -38,7 +47,20 @@ export const ExpenseForm = () => {
       return
     }
     setError('')
-    dispatch({ type: 'add-expense', payload: { expense } })
+    if (state.editingId) {
+      dispatch({
+        type: 'update-expense',
+        payload: { expense: { id: state.editingId, ...expense } }
+      })
+    } else {
+      dispatch({ type: 'add-expense', payload: { expense } })
+    }
+    setExpense({
+      expenseName: '',
+      amount: 0,
+      category: '',
+      date: new Date()
+    })
   }
 
   return (
